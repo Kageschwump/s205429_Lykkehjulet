@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">s205429 Lykkehjulet</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="textview">Welcome to the Wheel of Fortune! \n Press play to start a game</string>
+    <string name="button">Play</string>
 </resources>
