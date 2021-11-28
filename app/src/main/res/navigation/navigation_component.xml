@@ -16,7 +16,7 @@
         android:label="fragment_start"
         tools:layout="@layout/fragment_start" >
         <action
-            android:id="@+id/action_startFragment_to_gameFragment"
+            android:id="@+id/navigateToGameFragment"
             app:destination="@id/gameFragment" />
     </fragment>
 </navigation>

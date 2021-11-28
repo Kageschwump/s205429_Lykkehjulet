@@ -4,4 +4,9 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="textview">Welcome to the Wheel of Fortune! \n Press play to start a game</string>
     <string name="button">Play</string>
+    <string name="textview1">TextView</string>
+    <string name="cash">Cash:</string>
+    <string name="guessed_letters">Guessed letters:</string>
+    <string name="status">Status</string>
+    <string name="lives">Lives: </string>
 </resources>
