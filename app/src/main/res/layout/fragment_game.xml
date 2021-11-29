@@ -50,7 +50,7 @@
             app:layout_constraintVertical_bias="0.133" />
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/cash"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/cash"
@@ -91,7 +91,7 @@
             app:layout_constraintVertical_bias="0.898" />
 
         <TextView
-            android:id="@+id/textView5"
+            android:id="@+id/status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/status"
@@ -106,7 +106,7 @@
             app:layout_constraintVertical_bias="0.437" />
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/category"
             android:layout_width="104dp"
             android:layout_height="36dp"
             android:text="Category"
@@ -120,6 +120,22 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.187" />
+
+
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="413dp"
+                android:layout_height="58dp"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.31" />
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

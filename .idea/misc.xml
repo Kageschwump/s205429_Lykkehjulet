@@ -3,9 +3,14 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Skov/AndroidStudioProjects/Lykkehjulet1/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.3828125" />
+        <entry key="..\:/Users/Skov/AndroidStudioProjects/Lykkehjulet1/app/src/main/res/drawable/ic_launcher_background.xml" value="0.3828125" />
+        <entry key="..\:/Users/Skov/AndroidStudioProjects/Lykkehjulet1/app/src/main/res/drawable/letter_box.xml" value="0.3828125" />
         <entry key="..\:/Users/Skov/AndroidStudioProjects/Lykkehjulet1/app/src/main/res/layout/activity_main.xml" value="0.33" />
-        <entry key="..\:/Users/Skov/AndroidStudioProjects/Lykkehjulet1/app/src/main/res/layout/fragment_game.xml" value="0.41959531416400425" />
+        <entry key="..\:/Users/Skov/AndroidStudioProjects/Lykkehjulet1/app/src/main/res/layout/fragment_game.xml" value="0.25" />
         <entry key="..\:/Users/Skov/AndroidStudioProjects/Lykkehjulet1/app/src/main/res/layout/fragment_start.xml" value="0.33" />
+        <entry key="..\:/Users/Skov/AndroidStudioProjects/Lykkehjulet1/app/src/main/res/layout/letterbox.xml" value="1.2976973684210527" />
+        <entry key="..\:/Users/Skov/AndroidStudioProjects/Lykkehjulet1/app/src/main/res/layout/letterbox_layout.xml" value="0.33" />
         <entry key="..\:/Users/Skov/AndroidStudioProjects/Lykkehjulet1/app/src/main/res/layout/start_game.xml" value="0.22" />
       </map>
     </option>
