@@ -38,8 +38,9 @@ class GameFragment : Fragment() {
 
         generateWord()
         updateUser()
-
         var wordArray: CharArray = hiddenWord.toCharArray()
+        var wordAdapter = WordAdapter(wordArray)
+        binding.recyclerView.adapter = wordAdapter
 
 
         binding.status.text = "Press the wheel to get started!"
@@ -86,6 +87,8 @@ class GameFragment : Fragment() {
     }
 
     inner class WordAdapter(var arr: CharArray): RecyclerView.Adapter<GameFragment.WordViewHolder>(){
+
+
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WordViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.letterbox, parent, false)
 
@@ -93,21 +96,16 @@ class GameFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: WordViewHolder, position: Int) {
-            holder.itemView.
+            holder.letterBox.text = arr[position].toString()
         }
 
         override fun getItemCount(): Int {
             return arr.size
         }
-
     }
 
     inner class WordViewHolder(textView: View) : RecyclerView.ViewHolder(textView){
-        private var letterBox : TextView = textView.findViewById(R.id.letterBox)
-
-        fun()
-
-
+        var letterBox : TextView = textView.findViewById(R.id.letterBox)
     }
 }
 
