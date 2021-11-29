@@ -25,7 +25,8 @@ class GameFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
     private val viewModel: GameFragmentViewModel by viewModels()
-    private var hiddenWord: String = ""
+    private var word: String = ""
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,20 +39,21 @@ class GameFragment : Fragment() {
 
         generateWord()
         updateUser()
-        var wordArray: CharArray = hiddenWord.toCharArray()
-        var wordAdapter = WordAdapter(wordArray)
-        binding.recyclerView.adapter = wordAdapter
+        var wordArray: CharArray = word.toCharArray()
+        var hiddenWordArray: CharArray = word.toCharArray()
+        for(i in hiddenWordArray.indices){
+            hiddenWordArray[i] = '_'
+        }
 
+        var wordAdapter = WordAdapter(hiddenWordArray)
+        binding.recyclerView.adapter = wordAdapter
 
         binding.status.text = "Press the wheel to get started!"
 
         binding.wheel.setOnClickListener {
-            viewModel.user.lives-=1
+            spinWheel()
             updateUser()
-
         }
-
-
         return view
     }
 
@@ -82,9 +84,34 @@ class GameFragment : Fragment() {
             hiddenWord = WordList.Mammals.cat[wordNumber]
             binding.category.text = "Mammals"
         }
-        this.hiddenWord = hiddenWord
+        this.word = hiddenWord
 
     }
+
+    fun spinWheel(){
+        var nr: Int = (1..10).random()
+
+        if(nr == 1){
+            viewModel.user.bankrupt()
+            binding.status.text = "You went bankrupt! :-( \n" +
+                    "press the wheel to spin again"
+        } else if(nr == 2){
+            viewModel.user.addLife()
+            binding.status.text = "You gained a life! :-) \n" +
+                    "press the wheel to spin again"
+
+        } else if(nr == 3){
+            viewModel.user.subtractLife()
+            binding.status.text = "You lost a life :-( \n" +
+                    "press the wheel to spin again"
+
+        }else {
+            var roll = (1..20).random()*100
+            binding.status.text = "you rolled $roll. Guess a letter in the word"
+        }
+
+    }
+
 
     inner class WordAdapter(var arr: CharArray): RecyclerView.Adapter<GameFragment.WordViewHolder>(){
 
@@ -106,6 +133,7 @@ class GameFragment : Fragment() {
 
     inner class WordViewHolder(textView: View) : RecyclerView.ViewHolder(textView){
         var letterBox : TextView = textView.findViewById(R.id.letterBox)
+
     }
 }
 
