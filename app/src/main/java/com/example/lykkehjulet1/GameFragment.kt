@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lykkehjulet1.databinding.FragmentGameBinding
+import java.lang.StringBuilder
 import kotlin.random.Random
 
 
@@ -25,7 +26,7 @@ class GameFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
     private val viewModel: GameFragmentViewModel by viewModels()
-    private var word: String = ""
+    private lateinit var wordAdapter: WordAdapter
 
 
     override fun onCreateView(
@@ -36,16 +37,11 @@ class GameFragment : Fragment() {
         _binding = FragmentGameBinding.inflate(inflater, container, false)
         val view = binding.root
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-
         generateWord()
         updateUser()
-        var wordArray: CharArray = word.toCharArray()
-        var hiddenWordArray: CharArray = word.toCharArray()
-        for(i in hiddenWordArray.indices){
-            hiddenWordArray[i] = '_'
-        }
+        viewModel.hiddenWord = hideWord()
 
-        var wordAdapter = WordAdapter(hiddenWordArray)
+        wordAdapter = WordAdapter(viewModel.hiddenWord.toString())
         binding.recyclerView.adapter = wordAdapter
 
         binding.status.text = "Press the wheel to get started!"
@@ -57,11 +53,6 @@ class GameFragment : Fragment() {
         return view
     }
 
-
-    fun updateUser(){
-        binding.lives.text = "Lives: " + viewModel.user.lives
-        binding.cash.text = "Cash: " + viewModel.user.cash
-    }
 
     fun generateWord(){
         var hiddenWord: String = ""
@@ -84,8 +75,24 @@ class GameFragment : Fragment() {
             hiddenWord = WordList.Mammals.cat[wordNumber]
             binding.category.text = "Mammals"
         }
-        this.word = hiddenWord
+        viewModel.hiddenWord = hiddenWord
+        viewModel.word = hiddenWord
 
+    }
+
+    fun updateUser(){
+        binding.lives.text = "Lives: " + viewModel.user.lives
+        binding.cash.text = "Cash: " + viewModel.user.cash
+    }
+
+
+    fun hideWord(): String{
+        val builder = StringBuilder()
+        for(i in viewModel.hiddenWord!!.indices){
+            builder.append('_')
+
+        }
+        return builder.toString()
     }
 
     fun spinWheel(){
@@ -107,13 +114,58 @@ class GameFragment : Fragment() {
 
         }else {
             var roll = (1..20).random()*100
-            binding.status.text = "you rolled $roll. Guess a letter in the word"
-        }
+            var occurences: Int
 
+            binding.status.text = "you rolled $roll. Guess a letter in the word"
+            binding.guessButton.setOnClickListener {
+                if(binding.inputFromUser.text.isNotEmpty()){
+                    binding.inputFromUser.text.toString().lowercase()
+                    val guessedLetter: CharArray = binding.inputFromUser.text.toString().toCharArray()
+
+                    occurences = checkForLetter(guessedLetter, 0)
+
+                    if(occurences == 0){
+                        viewModel.user.subtractLife()
+                    } else {
+                        viewModel.user.cash += roll*occurences
+                    }
+                }
+            }
+
+        }
+        updateUser()
+    }
+
+    fun checkForLetter(char: CharArray, fixedPos: Int): Int{
+        var counter: Int = 0
+        val builder = StringBuilder()
+
+
+            for (i in viewModel.word!!.indices) {
+                if (char[fixedPos] == viewModel.word!![i]) {
+                    if (char[fixedPos] != viewModel.hiddenWord!![i]) {
+                        builder.append(char[fixedPos])
+                        counter++
+                    } else {
+                        builder.append(char[fixedPos])
+                    }
+                }
+                else if( viewModel.word!![i] == viewModel.hiddenWord!![i]){
+                    builder.append(viewModel.hiddenWord!![i])
+                } else
+                    builder.append('_')
+            }
+
+        viewModel.hiddenWord = builder.toString()
+        wordAdapter.update(viewModel.hiddenWord.toString())
+        for(i in viewModel.hiddenWord!!.indices)
+            wordAdapter.notifyItemChanged(i)
+
+        return counter
     }
 
 
-    inner class WordAdapter(var arr: CharArray): RecyclerView.Adapter<GameFragment.WordViewHolder>(){
+    inner class WordAdapter(var string: String): RecyclerView.Adapter<GameFragment.WordViewHolder>(){
 
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WordViewHolder {
@@ -123,11 +175,15 @@ class GameFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: WordViewHolder, position: Int) {
-            holder.letterBox.text = arr[position].toString()
+            holder.letterBox.text = string[position].toString()
         }
 
         override fun getItemCount(): Int {
-            return arr.size
+            return string.length
+        }
+
+        fun update(hiddenWord: String){
+            string = hiddenWord
         }
     }
 
