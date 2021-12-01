@@ -8,7 +8,9 @@
         <entry key="..\:/Users/Skov/AndroidStudioProjects/Lykkehjulet1/app/src/main/res/drawable/letter_box.xml" value="0.3828125" />
         <entry key="..\:/Users/Skov/AndroidStudioProjects/Lykkehjulet1/app/src/main/res/layout/activity_main.xml" value="0.33" />
         <entry key="..\:/Users/Skov/AndroidStudioProjects/Lykkehjulet1/app/src/main/res/layout/fragment_game.xml" value="0.25" />
+        <entry key="..\:/Users/Skov/AndroidStudioProjects/Lykkehjulet1/app/src/main/res/layout/fragment_lose.xml" value="0.20520833333333333" />
         <entry key="..\:/Users/Skov/AndroidStudioProjects/Lykkehjulet1/app/src/main/res/layout/fragment_start.xml" value="0.33" />
+        <entry key="..\:/Users/Skov/AndroidStudioProjects/Lykkehjulet1/app/src/main/res/layout/fragment_win.xml" value="0.2015625" />
         <entry key="..\:/Users/Skov/AndroidStudioProjects/Lykkehjulet1/app/src/main/res/layout/letterbox.xml" value="1.2976973684210527" />
         <entry key="..\:/Users/Skov/AndroidStudioProjects/Lykkehjulet1/app/src/main/res/layout/letterbox_layout.xml" value="0.33" />
         <entry key="..\:/Users/Skov/AndroidStudioProjects/Lykkehjulet1/app/src/main/res/layout/start_game.xml" value="0.22" />

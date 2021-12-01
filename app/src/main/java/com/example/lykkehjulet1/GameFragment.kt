@@ -4,13 +4,14 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.inflate
+import android.view.View.*
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lykkehjulet1.databinding.FragmentGameBinding
@@ -27,6 +28,7 @@ class GameFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: GameFragmentViewModel by viewModels()
     private lateinit var wordAdapter: WordAdapter
+    private var available = true
 
 
     override fun onCreateView(
@@ -37,6 +39,7 @@ class GameFragment : Fragment() {
         _binding = FragmentGameBinding.inflate(inflater, container, false)
         val view = binding.root
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+
         generateWord()
         updateUser()
         viewModel.hiddenWord = hideWord()
@@ -47,8 +50,8 @@ class GameFragment : Fragment() {
         binding.status.text = "Press the wheel to get started!"
 
         binding.wheel.setOnClickListener {
-            spinWheel()
-            updateUser()
+            if(available)
+            spinWheel(view)
         }
         return view
     }
@@ -95,46 +98,78 @@ class GameFragment : Fragment() {
         return builder.toString()
     }
 
-    fun spinWheel(){
+    fun spinWheel(view: View){
         var nr: Int = (1..10).random()
 
         if(nr == 1){
             viewModel.user.bankrupt()
+            updateUser()
             binding.status.text = "You went bankrupt! :-( \n" +
                     "press the wheel to spin again"
         } else if(nr == 2){
             viewModel.user.addLife()
+            updateUser()
             binding.status.text = "You gained a life! :-) \n" +
                     "press the wheel to spin again"
 
         } else if(nr == 3){
             viewModel.user.subtractLife()
+            updateUser()
             binding.status.text = "You lost a life :-( \n" +
                     "press the wheel to spin again"
+            if(viewModel.user.lives <= 0){
+                Navigation.findNavController(view).navigate(R.id.navigateToLoseFragment)
+            }
 
         }else {
+            showGuess()
             var roll = (1..20).random()*100
             var occurences: Int
 
             binding.status.text = "you rolled $roll. Guess a letter in the word"
             binding.guessButton.setOnClickListener {
-                if(binding.inputFromUser.text.isNotEmpty()){
+                if(binding.inputFromUser.text.isNotEmpty()) {
+
                     binding.inputFromUser.text.toString().lowercase()
-                    val guessedLetter: CharArray = binding.inputFromUser.text.toString().toCharArray()
 
-                    occurences = checkForLetter(guessedLetter, 0)
+                    if (binding.inputFromUser.text.toString().toCharArray()[0] !in viewModel.guessedLetters) {
+                        val guessedLetter: CharArray =
+                            binding.inputFromUser.text.toString().toCharArray()
 
-                    if(occurences == 0){
-                        viewModel.user.subtractLife()
-                    } else {
-                        viewModel.user.cash += roll*occurences
+                        occurences = checkForLetter(guessedLetter, 0)
+
+                        if (occurences == 0) {
+                            viewModel.user.subtractLife()
+                            viewModel.guessedLetters!!.add(guessedLetter[0])
+                            showGuessedLetters()
+                            hideGuess()
+                            updateUser()
+                            binding.status.text =
+                                "Wrong! \n That letter is not in the word. Spin again"
+                            if (viewModel.user.lives <= 0) {
+                                Navigation.findNavController(view)
+                                    .navigate(R.id.navigateToLoseFragment)
+                            }
+                        } else {
+                            binding.status.text =
+                                "Correct!! \n That letter was present $occurences times. Spin again"
+                            viewModel.user.cash += roll * occurences
+                            viewModel.guessedLetters!!.add(guessedLetter[0])
+                            showGuessedLetters()
+                            if (viewModel.word.equals(viewModel.hiddenWord)) {
+                                updateUser()
+                                Navigation.findNavController(view)
+                                    .navigate(R.id.navigateToWinFragment)
+                            }
+                            updateUser()
+                            hideGuess()
+                        }
                     }
                 }
             }
-
         }
-        updateUser()
     }
+
 
     fun checkForLetter(char: CharArray, fixedPos: Int): Int{
         var counter: Int = 0
@@ -162,6 +197,23 @@ class GameFragment : Fragment() {
             wordAdapter.notifyItemChanged(i)
 
         return counter
+    }
+
+    fun hideGuess() {
+        binding.guessButton.isEnabled = false
+        available = true
+    }
+
+    fun showGuess(){
+        binding.guessButton.isEnabled = true
+        available = false
+    }
+
+    fun showGuessedLetters(){
+        binding.guessedLetters.text = "Guessed letters:\n"
+                for(i in viewModel.guessedLetters){
+                    binding.guessedLetters.text = binding.guessedLetters.text.toString() + " $i"
+                }
     }
 
 
