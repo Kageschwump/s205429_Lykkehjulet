@@ -201,11 +201,13 @@ class GameFragment : Fragment() {
 
     fun hideGuess() {
         binding.guessButton.isEnabled = false
+        binding.inputFromUser.visibility = INVISIBLE
         available = true
     }
 
     fun showGuess(){
         binding.guessButton.isEnabled = true
+        binding.inputFromUser.visibility = VISIBLE
         available = false
     }
 
