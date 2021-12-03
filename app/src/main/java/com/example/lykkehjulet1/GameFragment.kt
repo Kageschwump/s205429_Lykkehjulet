@@ -22,9 +22,10 @@ import kotlin.random.Random
 class GameFragment : Fragment() {
 
 
+    /**
+     * In this fragment viewbinding is used in order to easily handle the view.
+     */
     private var _binding: FragmentGameBinding? = null
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
     private val viewModel: GameFragmentViewModel by viewModels()
     private lateinit var wordAdapter: WordAdapter
@@ -38,17 +39,31 @@ class GameFragment : Fragment() {
         // Inflate the layout for this fragment
         _binding = FragmentGameBinding.inflate(inflater, container, false)
         val view = binding.root
+
+        /**
+         * Attaching a layoutmanager to the recyclerview.
+         * This linearlayoutmanager is responsible for deciding how the recyclerview is gonna be organized.
+         */
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
+        /**
+         * Generating the word, hiding it and updating the view with the data of the User.
+         */
         generateWord()
         updateUser()
         viewModel.hiddenWord = hideWord()
 
+        /**
+         * initializing the adapter, and attaching it to the recyclerview.
+         */
         wordAdapter = WordAdapter(viewModel.hiddenWord.toString())
         binding.recyclerView.adapter = wordAdapter
 
         binding.status.text = "Press the wheel to get started!"
 
+        /**
+         * if available, spin the wheel
+         */
         binding.wheel.setOnClickListener {
             if(available)
             spinWheel(view)
@@ -57,6 +72,10 @@ class GameFragment : Fragment() {
     }
 
 
+    /**
+     * This function generates a word from the WordList. two random ints are picked and that
+     * determines which word is being picked.
+     */
     fun generateWord(){
         var hiddenWord: String = ""
 
@@ -83,12 +102,19 @@ class GameFragment : Fragment() {
 
     }
 
+    /**
+     * Updates the users data in the view
+     */
     fun updateUser(){
         binding.lives.text = "Lives: " + viewModel.user.lives
         binding.cash.text = "Cash: " + viewModel.user.cash
     }
 
 
+    /**
+     * This function hides the word.
+     * In other words the word is being replaced with x amount of '_'
+     */
     fun hideWord(): String{
         val builder = StringBuilder()
         for(i in viewModel.hiddenWord!!.indices){
@@ -98,6 +124,13 @@ class GameFragment : Fragment() {
         return builder.toString()
     }
 
+
+    /**
+     * This function handles what happens if you spin the wheel. A random number
+     * is picked between 1 and 10. If the number is either 1,2 or 3 then the User
+     * goes bankrupt, loses a life or gains a life, else a random amount of points is
+     * chosen, and the user has to guess a letter in the word.
+     */
     fun spinWheel(view: View){
         var nr: Int = (1..10).random()
 
@@ -124,57 +157,72 @@ class GameFragment : Fragment() {
         }else {
             showGuess()
             var roll = (1..20).random()*100
-            var occurences: Int
-
             binding.status.text = "you rolled $roll. Guess a letter in the word"
             binding.guessButton.setOnClickListener {
-                if(binding.inputFromUser.text.isNotEmpty()) {
-
-                    binding.inputFromUser.text.toString().lowercase()
-
-                    if (binding.inputFromUser.text.toString().toCharArray()[0] !in viewModel.guessedLetters) {
-                        val guessedLetter: CharArray =
-                            binding.inputFromUser.text.toString().toCharArray()
-
-                        occurences = checkForLetter(guessedLetter, 0)
-
-                        if (occurences == 0) {
-                            viewModel.user.subtractLife()
-                            viewModel.guessedLetters!!.add(guessedLetter[0])
-                            showGuessedLetters()
-                            hideGuess()
-                            updateUser()
-                            binding.status.text =
-                                "Wrong! \n That letter is not in the word. Spin again"
-                            if (viewModel.user.lives <= 0) {
-                                Navigation.findNavController(view)
-                                    .navigate(R.id.navigateToLoseFragment)
-                            }
-                        } else {
-                            binding.status.text =
-                                "Correct!! \n That letter was present $occurences times. Spin again"
-                            viewModel.user.cash += roll * occurences
-                            viewModel.guessedLetters!!.add(guessedLetter[0])
-                            showGuessedLetters()
-                            if (viewModel.word.equals(viewModel.hiddenWord)) {
-                                updateUser()
-                                Navigation.findNavController(view)
-                                    .navigate(R.id.navigateToWinFragment)
-                            }
-                            updateUser()
-                            hideGuess()
-                        }
-                    }
-                }
+                handleUserGuess(roll, view)
             }
         }
     }
 
 
+    /**
+     * This function handles the User guess. It takes the input from the user and compares it to
+     * each letter in the hidden word. If no occurences of the guessed letter is in the word
+     * the user loses a life. Else the user gets the number of occurences times the
+     * amount of cash that was rolled when the user spun the wheel. this function also
+     * handles if the game is either won or lost.
+     */
+    fun handleUserGuess(roll: Int, view: View){
+        var occurences: Int
+
+        if(binding.inputFromUser.text.isNotEmpty()) {
+            binding.inputFromUser.text.toString().lowercase()
+
+            if (binding.inputFromUser.text.toString().toCharArray()[0] !in viewModel.guessedLetters) {
+                val guessedLetter: CharArray =
+                    binding.inputFromUser.text.toString().toCharArray()
+                occurences = checkForLetter(guessedLetter, 0)
+
+                if (occurences == 0) {
+                    binding.status.text =
+                        "Wrong! \n That letter is not in the word. Spin again"
+                    viewModel.user.subtractLife()
+                    viewModel.guessedLetters!!.add(guessedLetter[0])
+                    hideGuess()
+                    updateUI()
+                    isGameOver(view)
+
+                } else {
+                    binding.status.text =
+                        "Correct!! \n That letter was present $occurences times. Spin again"
+                    viewModel.user.cash += roll * occurences
+                    viewModel.guessedLetters!!.add(guessedLetter[0])
+                    isGameOver(view)
+                    updateUI()
+                    hideGuess()
+                }
+            }
+        }
+    }
+
+    /**
+     * Updates the view
+     */
+    fun updateUI(){
+        updateUser()
+        showGuessedLetters()
+    }
+
+    /**
+     * This function is responsible for comparing the guessed letter to each of the letters
+     * in the hidden word. This function also uses Stringbuilder to rebuild the hiddenword
+     * with the guessed letter if the letter occurs in the hidden word. it then notifies the
+     * adapter class with the new string, so the recyclerview updates. Lastly it returns the
+     * amount of times the letter occured in the word.
+     */
     fun checkForLetter(char: CharArray, fixedPos: Int): Int{
         var counter: Int = 0
         val builder = StringBuilder()
-
 
             for (i in viewModel.word!!.indices) {
                 if (char[fixedPos] == viewModel.word!![i]) {
@@ -199,18 +247,42 @@ class GameFragment : Fragment() {
         return counter
     }
 
+    /**
+     * Checks if the game is either won or lost
+     */
+    fun isGameOver(view: View){
+        if (viewModel.user.lives <= 0) {
+            Navigation.findNavController(view)
+                .navigate(R.id.navigateToLoseFragment)
+        } else if (viewModel.word.equals(viewModel.hiddenWord)) {
+            updateUser()
+            Navigation.findNavController(view)
+                .navigate(R.id.navigateToWinFragment)
+        }
+    }
+
+    /**
+     * This function disables the guess button and hides the text input field
+     */
     fun hideGuess() {
         binding.guessButton.isEnabled = false
         binding.inputFromUser.visibility = INVISIBLE
         available = true
     }
 
+    /**
+     * This function enables the guess button and shows the text input field
+     */
     fun showGuess(){
         binding.guessButton.isEnabled = true
         binding.inputFromUser.visibility = VISIBLE
         available = false
     }
 
+    /**
+     * This function is responsible for updating the guessed letters text field.
+     * it is called after every guess made by the user
+     */
     fun showGuessedLetters(){
         binding.guessedLetters.text = "Guessed letters:\n"
                 for(i in viewModel.guessedLetters){
@@ -219,6 +291,11 @@ class GameFragment : Fragment() {
     }
 
 
+    /**
+     * This is the adapter for the recyclerview implemented in the app
+     * The function update() updates the word that the recyclerview uses. The recycler view is
+     * used to show the hidden word on the screen.
+     */
     inner class WordAdapter(var string: String): RecyclerView.Adapter<GameFragment.WordViewHolder>(){
 
 
@@ -241,6 +318,10 @@ class GameFragment : Fragment() {
         }
     }
 
+    /**
+     * The Viewholder is responsible for holding the template of how each element in
+     * the recycler is supposed to look.
+     */
     inner class WordViewHolder(textView: View) : RecyclerView.ViewHolder(textView){
         var letterBox : TextView = textView.findViewById(R.id.letterBox)
 

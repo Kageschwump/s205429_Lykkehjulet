@@ -8,7 +8,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.navigation.Navigation
 
-
+/**
+ * Fragment that decides what the User sees if the game is won
+ */
 class WinFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

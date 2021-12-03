@@ -8,7 +8,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.navigation.Navigation
 
-
+/**
+ * Fragment that decides what the user sees at the start of the application.
+ */
 
 class StartFragment : Fragment() {
 
