@@ -24,6 +24,7 @@ class GameFragment : Fragment() {
 
     /**
      * In this fragment viewbinding is used in order to easily handle the view.
+     * Recycler view is being used to display the hidden word
      */
     private var _binding: FragmentGameBinding? = null
     private val binding get() = _binding!!
@@ -295,6 +296,10 @@ class GameFragment : Fragment() {
      * This is the adapter for the recyclerview implemented in the app
      * The function update() updates the word that the recyclerview uses. The recycler view is
      * used to show the hidden word on the screen.
+     *
+     * The recyclerview holds textviews with the 'unchecked checkbox' drawable as a background
+     * The unchecked checbox is found in @android:drawable. a letter from the hidden word is
+     * then taken and put inside a checkbox.
      */
     inner class WordAdapter(var string: String): RecyclerView.Adapter<GameFragment.WordViewHolder>(){
 
